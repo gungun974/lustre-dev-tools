@@ -81,6 +81,8 @@ pub fn start(
 
   let supervisor_builder = case tls {
     Some(#(https_port, cert, key)) -> {
+      silence_tls_handshake_noise()
+
       let https_server =
         mist.new(handler)
         |> mist.port(https_port)
@@ -107,6 +109,9 @@ pub fn start(
   |> static_supervisor.start
   |> result.map_error(error.CouldNotStartDevServer)
 }
+
+@external(erlang, "server_ffi", "silence_tls_handshake_noise")
+fn silence_tls_handshake_noise() -> Nil
 
 ///
 ///
