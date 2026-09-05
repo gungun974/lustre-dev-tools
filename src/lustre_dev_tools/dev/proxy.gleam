@@ -106,7 +106,10 @@ pub fn handle(
 
         let path = filepath.join(to.path, path)
         let assert Some(host) = to.host
-        let assert Ok(body) = wisp.read_body_bits(request)
+        let assert Ok(body) =
+          request
+          |> wisp.set_max_body_size(1_000_000_000_000)
+          |> wisp.read_body_bits
 
         Request(..request, host:, port: to.port, path:, body:)
         |> httpc.send_bits
