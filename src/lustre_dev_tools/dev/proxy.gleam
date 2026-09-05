@@ -70,8 +70,7 @@ pub fn get_proxies_from_config(
           array
           |> list.map(fn(table) {
             case table {
-              tom.InlineTable(proxy) | tom.Table(proxy) ->
-                parse_proxy(proxy)
+              tom.InlineTable(proxy) | tom.Table(proxy) -> parse_proxy(proxy)
               _ -> Error(error.ProxyInvalidConfig)
             }
           })
@@ -112,7 +111,10 @@ pub fn handle(
           |> wisp.read_body_bits
 
         Request(..request, host:, port: to.port, path:, body:)
-        |> httpc.send_bits
+        |> httpc.dispatch_bits(
+          httpc.configure() |> httpc.timeout(1_000_000_000),
+          _,
+        )
         |> result.map(response.map(_, bytes_tree.from_bit_array))
         |> result.map(response.map(_, wisp.Bytes))
         |> result.unwrap(internal_error)
